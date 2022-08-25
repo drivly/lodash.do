@@ -3,3 +3,6 @@ Dynamic Chainable Lodash API
 
 
 <https://lodash.do/sortBy('age').reverse().head()/json.fyi/people.json>
+
+<https://lodash.do/sortBy('age').reverse().head()/json.fyi/people.json>
+  
