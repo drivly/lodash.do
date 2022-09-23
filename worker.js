@@ -18,9 +18,9 @@ export const api = {
 
 export default {
   fetch: async (req, env) => {
-    const { user, origin, requestId, method, body, time, pathSegments, pathOptions, url, query } = await env.CTX.fetch(req).then(res => res.json())
+    const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, url, query } = await env.CTX.fetch(req).then(res => res.json())
     
-    const methods = Object.keys(_)
+    const methods = Object.keys(_).map(method => `https://lodash.do/${method}${pathname}`)
 
     return new Response(JSON.stringify({ api, requestId, url, pathSegments, pathOptions, methods, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
