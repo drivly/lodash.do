@@ -19,7 +19,9 @@ export const api = {
 export default {
   fetch: async (req) => {
     const { user, origin, requestId, method, body, time, pathSegments, pathOptions, url, query } = await env.CTX.fetch(req).then(res => res.json())
+    
+    const methods = Object.keys(_)
 
-    return new Response(JSON.stringify({ api, requestId, url, pathSegments, pathOptions, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    return new Response(JSON.stringify({ api, requestId, url, pathSegments, pathOptions, methods, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
 }
