@@ -29,7 +29,7 @@ export default {
     try {
       _[pathSegments[0]]()
     } catch(ex) {
-      error = ex 
+      error = Object.entries(ex) 
     }
     
     const methods = Object.keys(_).reduce((acc, method) => {
