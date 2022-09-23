@@ -20,6 +20,10 @@ export default {
   fetch: async (req, env) => {
     const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, url, query } = await env.CTX.fetch(req).then(res => res.json())
     
+    const matcher = /(?<method>.+)\((?<args>.+)\)/g
+    
+    const exec = pathSegments.map(segment => segment.match(matcher))
+    
     const methods = Object.keys(_).reduce((acc, method) => {
       acc[method] = `https://lodash.do/${method}/:args${pathname}`
       return acc
