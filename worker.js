@@ -20,7 +20,7 @@ export default {
   fetch: async (req, env) => {
     const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, url, query } = await env.CTX.fetch(req).then(res => res.json())
     
-    const methods = Object.keys(_).reduce((acc, method) => acc[method] = `https://lodash.do/${method}${pathname}` && acc)
+    const methods = Object.keys(_).reduce((acc, method) => acc[method] = `https://lodash.do/${method}/:args${pathname}` && acc)
 
     return new Response(JSON.stringify({ api, url, pathSegments, pathOptions, methods, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
