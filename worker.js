@@ -29,6 +29,6 @@ export default {
       return acc
     }, {})
 
-    return new Response(JSON.stringify({ api, url, pathSegments, pathOptions, methods, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    return new Response(JSON.stringify({ api, url, pathSegments, pathOptions, exec, methods, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
 }
