@@ -1,17 +1,25 @@
 import _ from 'lodash'
 
+export const api = {
+  icon: '⚡️',
+  name: 'lodash.do',
+  description: 'Chainable Lodash API',
+  url: 'https://lodash.do/api',
+  type: 'https://apis.do/transformation',
+  endpoints: {
+    list: 'https://lodash.do/list',
+    get: 'https://lodash.do/:id',
+  },
+  site: 'https://lodash.do',
+  login: 'https://lodash.do/login',
+  signup: 'https://lodash.do/signup',
+  repo: 'https://github.com/drivly/lodash.do',
+}
+
 export default {
   fetch: async (req) => {
-    let { pathname, search, protocol } = new URL(req.url)
-    let p = pathname.substring(1).split('/').reverse()
-    const operation = p.pop()
-    pathname = pathname.substring(operation.length + 1)
-    console.log({ operation, pathname, search, url: protocol + '/' + pathname + search })
+    const { user, origin, requestId, method, body, time, pathSegments, pathOptions, url, query } = await env.CTX.fetch(req).then(res => res.json())
 
-    const data = await fetch(protocol + '/' + pathname + search, req).then((res) => res.json())
-
-    const retval = { data }
-
-    return new Response(JSON.stringify(retval, null, 2), { headers: { 'content-type': 'application/json' } })
+    return new Response(JSON.stringify({ api, requestId, url, pathSegments, pathOptions, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
 }
