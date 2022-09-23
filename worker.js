@@ -22,7 +22,7 @@ export default {
     
     const matcher = /(?<method>.+)\((?<args>.+)\)/g
     
-    const exec = pathSegments.map(segment => segment.match(matcher))
+    const exec = pathSegments.map(segment => segment.matchAll(matcher))
     
     const methods = Object.keys(_).reduce((acc, method) => {
       acc[method] = `https://lodash.do/${method}/:args${pathname}`
