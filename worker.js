@@ -17,7 +17,7 @@ export const api = {
 }
 
 export default {
-  fetch: async (req) => {
+  fetch: async (req, env) => {
     const { user, origin, requestId, method, body, time, pathSegments, pathOptions, url, query } = await env.CTX.fetch(req).then(res => res.json())
     
     const methods = Object.keys(_)
