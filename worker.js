@@ -22,6 +22,6 @@ export default {
     
     const methods = Object.keys(_).map(method => `https://lodash.do/${method}${pathname}`)
 
-    return new Response(JSON.stringify({ api, requestId, url, pathSegments, pathOptions, methods, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    return new Response(JSON.stringify({ api, url, pathSegments, pathOptions, methods, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
 }
