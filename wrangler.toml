@@ -1,5 +1,8 @@
 name = "lodash-do"
-account_id = "b6641681fe423910342b9ffa1364c76d"
-route = { pattern = "*lodash.do/*", zone_id = "0a3b06401326001667b2affc98e37855" }
+route = { pattern = "*/*", zone_name = "lodash.do" }
 main = "worker.js"
 compatibility_date = "2022-08-25"
+
+services = [
+  { binding = "CTX", service = "ctx-do", environment = "production" }
+]
