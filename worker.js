@@ -24,13 +24,19 @@ export default {
     
     const exec = pathSegments.map(segment => segment.matchAll(matcher))
     
-    const results = _[pathSegments[0]]()
+    let results, error = undefined
+    
+    try {
+      _[pathSegments[0]]()
+    } catch(ex) {
+      error = ex 
+    }
     
     const methods = Object.keys(_).reduce((acc, method) => {
       acc[method] = `https://lodash.do/${method}/:args${pathname}`
       return acc
     }, {})
 
-    return new Response(JSON.stringify({ api, url, pathSegments, pathOptions, exec, results, methods, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    return new Response(JSON.stringify({ api, url, pathSegments, pathOptions, exec, results, error, methods, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
 }
