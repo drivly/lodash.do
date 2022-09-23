@@ -1,5 +1,7 @@
 # [lodash.do](https://lodash.do)
 
+![Lodash Go](https://i.microlink.io/https%3A%2F%2Fcards.microlink.io%2F%3Fpreset%3Dbrowser)
+
 [![Build Status][build]](https://circleci.com/gh/drivly/lodash.do) [![npm]](https://www.npmjs.com/package/undux) [![mit]](https://opensource.org/licenses/MIT) [![ts]](https://www.typescriptlang.org/) [![flow]](https://flow.org/)
 
 [build]: https://img.shields.io/circleci/project/github/bcherny/undux/master.svg?style=flat-square
