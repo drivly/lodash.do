@@ -27,11 +27,12 @@ export default {
     if (rootPath) return new Response(JSON.stringify({ api, examples, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
     
     const [func,args,target] = pathSegments
+    let data, output, error = undefined
     
     let results, tokens, scripts, exec, methods, error = undefined
     try {
-      const data = await fetch('https://' + target).then(res => res.json())
-      const output = _.chain(data)[func]([...args]).value()
+      data = await fetch('https://' + target).then(res => res.json())
+      output = _.chain(data)[func]([...args]).value()
       
       
 //       tokens = pathSegments.map(segment => esprima.tokenize(segment))
@@ -51,7 +52,7 @@ export default {
       error = Object.entries(ex) 
     }
 
-    if (error) return new Response(JSON.stringify({ api, method, args, url, outputs, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    if (error) return new Response(JSON.stringify({ api, func, args, target, data, output, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
     return new Response(JSON.stringify(output, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
 }
