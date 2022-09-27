@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import esprima from 'esprima-next'
 
 export const api = {
   icon: '⚡️',
@@ -19,6 +20,9 @@ export const api = {
 export default {
   fetch: async (req, env) => {
     const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, url, query } = await env.CTX.fetch(req).then(res => res.json())
+    
+    const tokens = pathSegments.map(segment => esprima.tokenize(segment))
+    const scripts = pathSegments.map(segment => esprima.parseScript(segment))
     
     const matcher = /(?<method>.+)\((?<args>.+)\)/g
     
