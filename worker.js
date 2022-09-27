@@ -23,8 +23,8 @@ export const examples = {
 
 export default {
   fetch: async (req, env) => {
-    const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, url, query } = await env.CTX.fetch(req).then(res => res.json())
-    if (pathname == '/api') return new Response(JSON.stringify({ api, examples, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, url, query, rootPath } = await env.CTX.fetch(req).then(res => res.json())
+    if (rootPath) return new Response(JSON.stringify({ api, examples, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
     
     const [func,args,target] = pathSegments
     
