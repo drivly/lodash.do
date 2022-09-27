@@ -19,6 +19,7 @@
     "wrangler": "^2.0.27"
   },
   "dependencies": {
+    "esprima-next": "^5.8.4"
     "lodash": "^4.17.21"
   }
 }
