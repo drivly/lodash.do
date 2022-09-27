@@ -9,7 +9,7 @@ export const api = {
   type: 'https://apis.do/transformation',
   endpoints: {
     list: 'https://lodash.do/list',
-    get: 'https://lodash.do/:id',
+    '_': 'https://lodash.do/:method/:args/:url',
   },
   site: 'https://lodash.do',
   login: 'https://lodash.do/login',
@@ -21,29 +21,31 @@ export default {
   fetch: async (req, env) => {
     const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, url, query } = await env.CTX.fetch(req).then(res => res.json())
     
+    const [method,args,url] = pathSegments
+    
     let results, tokens, scripts, exec, methods, error = undefined
-      
     try {
+      const data = await fetch('https://' + url).then(res => res.json())
+      const output = _.chain(data).[method]([...args]).value()
+      
+      
+//       tokens = pathSegments.map(segment => esprima.tokenize(segment))
+//       scripts = pathSegments.map(segment => esprima.parseScript(segment))
 
-      tokens = pathSegments.map(segment => esprima.tokenize(segment))
-      scripts = pathSegments.map(segment => esprima.parseScript(segment))
+//       matcher = /(?<method>.+)\((?<args>.+)\)/g
 
-      matcher = /(?<method>.+)\((?<args>.+)\)/g
+//       exec = pathSegments.map(segment => segment.matchAll(matcher))
+//         _[pathSegments[0]]()
 
-      exec = pathSegments.map(segment => segment.matchAll(matcher))
-
-
-        _[pathSegments[0]]()
-
-      methods = Object.keys(_).reduce((acc, method) => {
-        acc[method] = `https://lodash.do/${method}/:args${pathname}`
-        return acc
-      }, {})
+//       methods = Object.keys(_).reduce((acc, method) => {
+//         acc[method] = `https://lodash.do/${method}/:args${pathname}`
+//         return acc
+//       }, {})
     
     } catch(ex) {
       error = Object.entries(ex) 
     }
 
-    return new Response(JSON.stringify({ api, tokens, scripts, url, pathSegments, pathOptions, exec, results, error, methods, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    return new Response(JSON.stringify({ api, method, args, url, outputs, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
 }
