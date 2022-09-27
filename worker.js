@@ -21,25 +21,28 @@ export default {
   fetch: async (req, env) => {
     const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, url, query } = await env.CTX.fetch(req).then(res => res.json())
     
-    const tokens = pathSegments.map(segment => esprima.tokenize(segment))
-    const scripts = pathSegments.map(segment => esprima.parseScript(segment))
-    
-    const matcher = /(?<method>.+)\((?<args>.+)\)/g
-    
-    const exec = pathSegments.map(segment => segment.matchAll(matcher))
-    
-    let results, error = undefined
-    
+    let results, tokens, scripts, exec, methods, error = undefined
+      
     try {
-      _[pathSegments[0]]()
+
+      tokens = pathSegments.map(segment => esprima.tokenize(segment))
+      scripts = pathSegments.map(segment => esprima.parseScript(segment))
+
+      matcher = /(?<method>.+)\((?<args>.+)\)/g
+
+      exec = pathSegments.map(segment => segment.matchAll(matcher))
+
+
+        _[pathSegments[0]]()
+
+      methods = Object.keys(_).reduce((acc, method) => {
+        acc[method] = `https://lodash.do/${method}/:args${pathname}`
+        return acc
+      }, {})
+    
     } catch(ex) {
       error = Object.entries(ex) 
     }
-    
-    const methods = Object.keys(_).reduce((acc, method) => {
-      acc[method] = `https://lodash.do/${method}/:args${pathname}`
-      return acc
-    }, {})
 
     return new Response(JSON.stringify({ api, tokens, scripts, url, pathSegments, pathOptions, exec, results, error, methods, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
