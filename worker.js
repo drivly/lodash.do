@@ -27,9 +27,8 @@ export default {
     if (rootPath) return new Response(JSON.stringify({ api, examples, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
     
     const [func,args,target] = pathSegments
-    let data, output, error = undefined
+    let results, tokens, scripts, exec, methods, data, output, error = undefined
     
-    let results, tokens, scripts, exec, methods, error = undefined
     try {
       data = await fetch('https://' + target).then(res => res.json())
       output = _.chain(data)[func]([...args]).value()
