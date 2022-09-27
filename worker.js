@@ -17,9 +17,14 @@ export const api = {
   repo: 'https://github.com/drivly/lodash.do',
 }
 
+export const examples = {
+  mapNameFromNorthwindProducts: 'https://lodash.do/map/Products.name/json.fyi/northwind.json'
+}
+
 export default {
   fetch: async (req, env) => {
     const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, url, query } = await env.CTX.fetch(req).then(res => res.json())
+    if (pathname == '/api') return new Response(JSON.stringify({ api, examples, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
     
     const [func,args,target] = pathSegments
     
@@ -46,6 +51,7 @@ export default {
       error = Object.entries(ex) 
     }
 
-    return new Response(JSON.stringify({ api, method, args, url, outputs, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    if (error) return new Response(JSON.stringify({ api, method, args, url, outputs, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    return new Response(JSON.stringify(output, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
 }
