@@ -47,8 +47,8 @@ export default {
 //         return acc
 //       }, {})
     
-    } catch(ex) {
-      error = Object.entries(ex) 
+    } catch({name,message}) {
+      error = {name,message} 
     }
 
     if (error) return new Response(JSON.stringify({ api, func, args, target, data, output, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
