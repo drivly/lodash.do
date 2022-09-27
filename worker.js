@@ -52,6 +52,6 @@ export default {
     }
 
     if (error) return new Response(JSON.stringify({ api, func, args, target, data, output, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
-    return new Response(JSON.stringify(output, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    return new Response(JSON.stringify({ api, func, args, target, data, output, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
 }
