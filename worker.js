@@ -21,12 +21,12 @@ export default {
   fetch: async (req, env) => {
     const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, url, query } = await env.CTX.fetch(req).then(res => res.json())
     
-    const [method,args,url] = pathSegments
+    const [func,args,target] = pathSegments
     
     let results, tokens, scripts, exec, methods, error = undefined
     try {
-      const data = await fetch('https://' + url).then(res => res.json())
-      const output = _.chain(data).[method]([...args]).value()
+      const data = await fetch('https://' + target).then(res => res.json())
+      const output = _.chain(data)[func]([...args]).value()
       
       
 //       tokens = pathSegments.map(segment => esprima.tokenize(segment))
