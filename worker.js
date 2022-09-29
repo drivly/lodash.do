@@ -27,13 +27,41 @@ export default {
     const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, url, query, rootPath } = await env.CTX.fetch(req).then(res => res.json())
     if (rootPath) return new Response(JSON.stringify({ api, examples, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
     
-    const [func,args,...target] = pathSegments
-    let results, tokens, scripts, exec, methods, data, output, error = undefined
+    console.log(pathOptions)
     
+    // let [func,args,...target] = pathOptions ? pathSegments.slice(1) : pathSegments
+    // let results, tokens, scripts, exec, methods = undefined
+
+    let methods = []
+    let segments = pathSegments
+
+    while (_[segments[0]]) {
+      methods.push({ name: segments[0], args: segments[1].split(',') })
+      segments = segments.slice(2)
+    }
+    let target = segments
+
+    let data, output, error = undefined
+
+    
+    console.log(target)
+    const source = target.length > 0 ? 'https://' + target.join('/') : undefined
+
+    let steps = []
+
     try {
-      data = target ? await fetch('https://' + target.join('/')).then(res => res.json()) : ['a', 'b', 'c', 'd', 'e', 'f']
-      output = _.chain(data)[func]([...args.split(',')]).value()
-      
+      data = source ? await fetch(source).then(res => res.json()) : [
+        { 'user': 'barney',  'age': 36 },
+        { 'user': 'fred',    'age': 40 },
+        { 'user': 'pebbles', 'age': 1 }
+      ]
+
+      for (let method of methods) {
+        output = _.chain(data)[method.name]([...method.args]).value()
+        steps.push({ method, data: output })
+        data = output
+      }
+
       
 //       tokens = pathSegments.map(segment => esprima.tokenize(segment))
 //       scripts = pathSegments.map(segment => esprima.parseScript(segment))
@@ -52,7 +80,7 @@ export default {
       error = {name,message} 
     }
 
-    if (error) return new Response(JSON.stringify({ api, func, args, target, data, output, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
-    return new Response(JSON.stringify({ api, func, args, target, output, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    if (error || pathOptions?.debug) return new Response(JSON.stringify({ api, methods, steps, source, data, output, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    return new Response(JSON.stringify({ api, source, methods, output, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
 }
