@@ -30,8 +30,8 @@ export default {
     let results, tokens, scripts, exec, methods, data, output, error = undefined
     
     try {
-      data = await fetch('https://' + target.join('/')).then(res => res.json())
-      output = _.chain(data)[func]([...args]).value()
+      data = target ? await fetch('https://' + target.join('/')).then(res => res.json()) : ['a', 'b', 'c', 'd']
+      output = _.chain(data)[func]([...args.split(',')]).value()
       
       
 //       tokens = pathSegments.map(segment => esprima.tokenize(segment))
