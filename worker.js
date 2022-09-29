@@ -18,7 +18,8 @@ export const api = {
 }
 
 export const examples = {
-  mapNameFromNorthwindProducts: 'https://lodash.do/map/Products.name/json.fyi/northwind.json'
+  mapNameFromNorthwindProducts: 'https://lodash.do/map/Products.name/json.fyi/northwind.json',
+  chunkData: 'https://lodash.do/chunk/2',
 }
 
 export default {
@@ -30,7 +31,7 @@ export default {
     let results, tokens, scripts, exec, methods, data, output, error = undefined
     
     try {
-      data = target ? await fetch('https://' + target.join('/')).then(res => res.json()) : ['a', 'b', 'c', 'd']
+      data = target ? await fetch('https://' + target.join('/')).then(res => res.json()) : ['a', 'b', 'c', 'd', 'e', 'f']
       output = _.chain(data)[func]([...args.split(',')]).value()
       
       
