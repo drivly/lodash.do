@@ -50,7 +50,7 @@ export default {
     }
     let target = segments
 
-    let data, output, error = undefined
+    let data, output, dataInProcess, error = undefined
 
     
     console.log(target)
@@ -69,9 +69,9 @@ export default {
       // chain = _.chain(data)
       for (let method of methods) {
         // output = _.chain(data)[method.name]([...method.args]).value()
-        output = _[method.name](data, [...method.args])
-        steps.push({ method, data: {...output} })
-        data = {...output}
+        output = _[method.name](dataInProcess ?? data, [...method.args])
+        steps.push({ method, data: output })
+        dataInProcess = output
         // chain = chain[method.name]([...method.args])      
       }
       // output = chain.value()
