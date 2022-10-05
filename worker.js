@@ -72,7 +72,7 @@ export default {
         // output = _[method.name](data, [...method.args])
         // steps.push({ method, data: output })
         // data = {...output}
-        chain[method.name]([...method.args])      
+        chain = chain[method.name]([...method.args])      
       }
       output = chain.value()
       
