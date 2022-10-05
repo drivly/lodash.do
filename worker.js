@@ -38,7 +38,11 @@ export default {
     let segments = pathSegments
 
     while (_[segments[0]]) {
-      methods.push({ name: segments[0], args: segments[1].split(',') })
+      const name = segments[0]
+      const args = segments[1].includes(',') ? 
+        (segments[1].includes(':') ? segments[1].split(',').reduce((acc, keyValue) => ({...acc, [keyValue.split(':')[0]]: keyValue.split(':')[1]}), {}) : segments[1].split(',')) :
+        (segments[1].includes(':') ? { [keyValue.split(':')[0]]: keyValue.split(':')[1] } : [segments[1]])
+      methods.push({ name, args })
       segments = segments.slice(2)
     }
     let target = segments
