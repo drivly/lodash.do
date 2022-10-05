@@ -40,7 +40,7 @@ export default {
     while (_[segments[0]]) {
       const name = segments[0]
       const args = segments[1].includes(':') ? 
-        segments[1].split(',').reduce((acc, keyValue) => ({...acc, [keyValue.split(':')[0]]: keyValue.split(':')[1]}), {}) : 
+        [segments[1].split(',').reduce((acc, keyValue) => ({...acc, [keyValue.split(':')[0]]: keyValue.split(':')[1]}), {})] : 
         segments[1].split(',')
       // const args = segments[1].includes(',') ? 
       //   (segments[1].includes(':') ? segments[1].split(',').reduce((acc, keyValue) => ({...acc, [keyValue.split(':')[0]]: keyValue.split(':')[1]}), {}) : segments[1].split(',')) :
