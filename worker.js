@@ -69,9 +69,9 @@ export default {
       // chain = _.chain(data)
       for (let method of methods) {
         // output = _.chain(data)[method.name]([...method.args]).value()
-        output = _[method.name](dataInProcess ?? data, [...method.args])
+        output = method.args.length == 1 ? _[method.name](data, method.args[0]) : _[method.name](data, [...method.args])
         steps.push({ method, data: output })
-        dataInProcess = output
+        data = output
         // chain = chain[method.name]([...method.args])      
       }
       // output = chain.value()
