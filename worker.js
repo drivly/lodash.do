@@ -66,9 +66,10 @@ export default {
       ]
 
       for (let method of methods) {
-        output = _.chain(data)[method.name]([...method.args]).value()
+        // output = _.chain(data)[method.name]([...method.args]).value()
+        output = _[method.name](data, [...method.args])
         steps.push({ method, data: output })
-        data = output
+        data = {...output}
       }
       
       
