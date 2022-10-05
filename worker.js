@@ -61,6 +61,8 @@ export default {
         steps.push({ method, data: output })
         data = output
       }
+      
+      const allMethods = Object.keys(_)
 
       
 //       tokens = pathSegments.map(segment => esprima.tokenize(segment))
@@ -81,6 +83,6 @@ export default {
     }
 
     if (error || pathOptions?.debug) return new Response(JSON.stringify({ api, methods, steps, source, data, output, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
-    return new Response(JSON.stringify({ api, source, methods, output, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    return new Response(JSON.stringify({ api, source, methods, output, allMethods, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
 }
