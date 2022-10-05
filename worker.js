@@ -39,9 +39,12 @@ export default {
 
     while (_[segments[0]]) {
       const name = segments[0]
-      const args = segments[1].includes(',') ? 
-        (segments[1].includes(':') ? segments[1].split(',').reduce((acc, keyValue) => ({...acc, [keyValue.split(':')[0]]: keyValue.split(':')[1]}), {}) : segments[1].split(',')) :
-        (segments[1].includes(':') ? [{ [segments[1].split(':')[0]]: segments[1].split(':')[1] }] : [segments[1]])
+      const args = segments[1].includes(':') ? 
+        segments[1].split(',').reduce((acc, keyValue) => ({...acc, [keyValue.split(':')[0]]: keyValue.split(':')[1]}), {}) : 
+        segments[1].split(',')
+      // const args = segments[1].includes(',') ? 
+      //   (segments[1].includes(':') ? segments[1].split(',').reduce((acc, keyValue) => ({...acc, [keyValue.split(':')[0]]: keyValue.split(':')[1]}), {}) : segments[1].split(',')) :
+      //   (segments[1].includes(':') ? [{ [segments[1].split(':')[0]]: segments[1].split(':')[1] }] : [segments[1]])
       methods.push({ name, args })
       segments = segments.slice(2)
     }
@@ -87,6 +90,6 @@ export default {
     }
 
     if (error || pathOptions?.debug) return new Response(JSON.stringify({ api, methods, steps, source, data, output, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
-    return new Response(JSON.stringify({ api, source, methods, output, allMethods, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
+    return new Response(JSON.stringify({ api, source, methods, output, steps, allMethods, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
   },
 }
