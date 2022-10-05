@@ -32,6 +32,8 @@ export default {
     // let [func,args,...target] = pathOptions ? pathSegments.slice(1) : pathSegments
     // let results, tokens, scripts, exec, methods = undefined
 
+    const allMethods = Object.keys(_)
+    
     let methods = []
     let segments = pathSegments
 
@@ -62,8 +64,6 @@ export default {
         data = output
       }
       
-      const allMethods = Object.keys(_)
-
       
 //       tokens = pathSegments.map(segment => esprima.tokenize(segment))
 //       scripts = pathSegments.map(segment => esprima.parseScript(segment))
