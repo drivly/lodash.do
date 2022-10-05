@@ -57,6 +57,7 @@ export default {
     const source = target.length > 0 ? 'https://' + target.join('/') : undefined
 
     let steps = []
+    let chain = undefined
 
     try {
       data = source ? await fetch(source).then(res => res.json()) : [
@@ -65,12 +66,15 @@ export default {
         { 'user': 'pebbles', 'age': 1 }
       ]
 
+      chain = _.chain(data)
       for (let method of methods) {
         // output = _.chain(data)[method.name]([...method.args]).value()
-        output = _[method.name](data, [...method.args])
-        steps.push({ method, data: output })
-        data = {...output}
+        // output = _[method.name](data, [...method.args])
+        // steps.push({ method, data: output })
+        // data = {...output}
+        chain[method.name]([...method.args])      
       }
+      output = chain.value()
       
       
 //       tokens = pathSegments.map(segment => esprima.tokenize(segment))
