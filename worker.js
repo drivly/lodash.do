@@ -66,15 +66,15 @@ export default {
         { 'user': 'pebbles', 'age': 1 }
       ]
 
-      chain = _.chain(data)
+      // chain = _.chain(data)
       for (let method of methods) {
         // output = _.chain(data)[method.name]([...method.args]).value()
-        // output = _[method.name](data, [...method.args])
-        // steps.push({ method, data: output })
-        // data = {...output}
-        chain = chain[method.name]([...method.args])      
+        output = _[method.name](data, [...method.args])
+        steps.push({ method, data: {...output} })
+        data = {...output}
+        // chain = chain[method.name]([...method.args])      
       }
-      output = chain.value()
+      // output = chain.value()
       
       
 //       tokens = pathSegments.map(segment => esprima.tokenize(segment))
