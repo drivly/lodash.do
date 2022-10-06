@@ -76,6 +76,7 @@ export default {
       }
       // output = chain.value()
       
+      if (output) return new Response(JSON.stringify(output, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
       
 //       tokens = pathSegments.map(segment => esprima.tokenize(segment))
 //       scripts = pathSegments.map(segment => esprima.parseScript(segment))
