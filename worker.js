@@ -18,7 +18,8 @@ export const api = {
 }
 
 export const examples = {
-  mapNameFromNorthwindProducts: 'https://lodash.do/map/Products.name/json.fyi/northwind.json',
+  getRandomNorthwindCustomer: 'https://lodash.do/get/Customer/sample/c/json.fyi/northwind.json',
+  mapContactNameFromNorthwindCustomers: 'https://lodash.do/get/Customer/map/contactName/json.fyi/northwind.json',
   chunkData: 'https://lodash.do/chunk/2',
 }
 
