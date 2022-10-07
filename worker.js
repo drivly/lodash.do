@@ -25,7 +25,7 @@ export const examples = {
 
 export default {
   fetch: async (req, env) => {
-    const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, url, query, rootPath } = await env.CTX.fetch(req).then(res => res.json())
+    const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, search, url, query, rootPath } = await env.CTX.fetch(req).then(res => res.json())
     if (rootPath) return new Response(JSON.stringify({ api, examples, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' }})
     
     console.log(pathOptions)
@@ -55,7 +55,7 @@ export default {
 
     
     console.log(target)
-    const source = target.length > 0 ? 'https://' + target.join('/') : undefined
+    const source = target.length > 0 ? 'https://' + target.join('/') + search : undefined
 
     let steps = []
     let chain = undefined
