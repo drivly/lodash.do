@@ -45,6 +45,10 @@ export default {
         [segments[1].split(',').reduce((acc, keyValue) => ({...acc, [keyValue.split(':')[0]]: keyValue.split(':')[1]}), {})] : 
         segments[1].split(',')
 
+      console.log(
+        (_[name] || '').toString()
+      )
+
       if (!_[args[0]]) {
         // This means the first arg is not a lodash method.
         len = 2
