@@ -45,15 +45,20 @@ export default {
         [segments[1].split(',').reduce((acc, keyValue) => ({...acc, [keyValue.split(':')[0]]: keyValue.split(':')[1]}), {})] : 
         segments[1].split(',')
 
+      const functionSignature = (_[name] || '').toString()
+
+      // Count required args
+      const required = functionSignature.match(/\(([^)]+)\)/)[0].replace(/\(|\)/g, '').split(',').filter(arg => arg !== '').length - 1
+
       console.log(
-        (_[name] || '').toString()
+        required
       )
 
-      if (!_[args[0]]) {
-        // This means the first arg is not a lodash method.
-        len = 2
-      } else {
+      if (required == 0) {
+        // this method takes no args.
         args = []
+      } else {
+        len = 2
       }
 
       // const args = segments[1].includes(',') ? 
