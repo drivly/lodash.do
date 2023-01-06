@@ -39,16 +39,30 @@ export default {
     let segments = pathSegments
 
     while (_[segments[0]]) {
+      let len = 1
       const name = segments[0]
-      const args = segments[1].includes(':') ? 
+      let args = segments[1].includes(':') ? 
         [segments[1].split(',').reduce((acc, keyValue) => ({...acc, [keyValue.split(':')[0]]: keyValue.split(':')[1]}), {})] : 
         segments[1].split(',')
+
+      if (!_[args[0]]) {
+        // This means the first arg is not a lodash method.
+        len = 2
+      } else {
+        args = []
+      }
+
       // const args = segments[1].includes(',') ? 
       //   (segments[1].includes(':') ? segments[1].split(',').reduce((acc, keyValue) => ({...acc, [keyValue.split(':')[0]]: keyValue.split(':')[1]}), {}) : segments[1].split(',')) :
       //   (segments[1].includes(':') ? [{ [segments[1].split(':')[0]]: segments[1].split(':')[1] }] : [segments[1]])
+
       methods.push({ name, args })
-      segments = segments.slice(2)
+      segments = segments.slice(len)
     }
+
+    console.log(
+      methods
+    )
     let target = segments
 
     let data, output, dataInProcess, error = undefined
