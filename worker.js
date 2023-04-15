@@ -42,10 +42,10 @@ export default {
       if (requiredArgCount) {
         args = segments[1].split(',')
         if (segments[1].includes(':')) { // Parse predicate args for filter, find, etc.
-          args = args.reduce((acc, keyValue) => {
+          args = [args.reduce((acc, keyValue) => {
             const [key, value] = keyValue.split(':')
             return { ...acc, [key]: value }
-          }, {})
+          }, {})]
         }
       }
 
@@ -57,15 +57,14 @@ export default {
     const source = segments.length > 0 ? 'https://' + segments.join('/') + search : undefined
     console.log({ methods: JSON.stringify(methods), source })
     try {
-      input = source ? await fetch(source).then((res) => res.json())
-        : [
-          { user: 'barney', age: 36 },
-          { user: 'fred', age: 40 },
-          { user: 'pebbles', age: 1 },
-        ]
+      input = source ? await fetch(source).then((res) => res.json()) : [
+        { user: 'barney', age: 36 },
+        { user: 'fred', age: 40 },
+        { user: 'pebbles', age: 1 },
+      ]
 
       for (let method of methods) {
-        output = method.args.length == 1 ? _[method.name](input, method.args[0]) : _[method.name](input, method.args)
+        output = _[method.name](input, ...method.args)
         steps.push({ method, data: output })
         input = output
       }
