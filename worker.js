@@ -63,8 +63,8 @@ export default {
         { user: 'pebbles', age: 1 },
       ]
 
-      data = pipeline(methods, data, steps)
-      if (data) return json(data)
+      output = pipeline(methods, data, steps)
+      if (output) return json(output)
     } catch ({ name, message }) {
       error = { name, message }
     }
