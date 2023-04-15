@@ -1,5 +1,4 @@
 import _ from 'lodash'
-// import esprima from 'esprima-next'
 
 export const api = {
   icon: '⚡️',
@@ -9,7 +8,7 @@ export const api = {
   type: 'https://apis.do/transformation',
   endpoints: {
     list: 'https://lodash.do/list',
-    '_': 'https://lodash.do/:method/:args/:url',
+    _: 'https://lodash.do/:method/:args/:url',
   },
   site: 'https://lodash.do',
   login: 'https://lodash.do/login',
@@ -25,101 +24,63 @@ export const examples = {
 
 export default {
   fetch: async (req, env) => {
-    const { user, origin, requestId, method, body, time, pathname, pathSegments, pathOptions, search, url, query, rootPath } = await env.CTX.fetch(req).then(res => res.json())
-    if (rootPath) return new Response(JSON.stringify({ api, examples, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' } })
+    const { user, pathSegments, search, rootPath } = await env.CTX.fetch(req).then((res) => res.json())
+    if (rootPath) return json({ api, examples, user })
 
-    console.log(pathOptions)
-
-    // let [func,args,...target] = pathOptions ? pathSegments.slice(1) : pathSegments
-    // let results, tokens, scripts, exec, methods = undefined
-
-    const allMethods = Object.keys(_)
-
-    let methods = []
-    let segments = pathSegments
-
+    let methods = [], segments = pathSegments
     while (_[segments[0]]) {
-      let len = 1
       const name = segments[0]
-      let args = segments[1].includes(':') ?
-        [segments[1].split(',').reduce((acc, keyValue) => ({ ...acc, [keyValue.split(':')[0]]: keyValue.split(':')[1] }), {})] :
-        segments[1].split(',')
+      const requiredArgCount =
+        (_[name] || '')
+          .toString()
+          .match(/\((.*)\)/)[0]
+          .replace(/\(|\)/g, '')
+          .split(',')
+          .filter((arg) => arg !== '').length - 1
 
-      const functionSignature = (_[name] || '').toString()
-
-      // Count required args
-      const required = functionSignature.match(/\(([^)]+)\)/)[0].replace(/\(|\)/g, '').split(',').filter(arg => arg !== '').length - 1
-
-      console.log(
-        required
-      )
-
-      if (required == 0) {
-        // this method takes no args.
-        args = []
-      } else {
-        len = 2
+      let args = []
+      if (requiredArgCount) {
+        args = segments[1].split(',')
+        if (segments[1].includes(':')) { // Parse predicate args for filter, find, etc.
+          args = args.reduce((acc, keyValue) => {
+            const [key, value] = keyValue.split(':')
+            return { ...acc, [key]: value }
+          }, {})
+        }
       }
-
-      // const args = segments[1].includes(',') ? 
-      //   (segments[1].includes(':') ? segments[1].split(',').reduce((acc, keyValue) => ({...acc, [keyValue.split(':')[0]]: keyValue.split(':')[1]}), {}) : segments[1].split(',')) :
-      //   (segments[1].includes(':') ? [{ [segments[1].split(':')[0]]: segments[1].split(':')[1] }] : [segments[1]])
 
       methods.push({ name, args })
-      segments = segments.slice(len)
+      segments = segments.slice(requiredArgCount ? 2 : 1)
     }
 
-    console.log(
-      methods
-    )
-    let target = segments
-
-    let data, output, dataInProcess, error = undefined
-
-
-    console.log(target)
-    const source = target.length > 0 ? 'https://' + target.join('/') + search : undefined
-
-    let steps = []
-    let chain = undefined
-
+    let steps = [], input, output, error
+    const source = segments.length > 0 ? 'https://' + segments.join('/') + search : undefined
+    console.log({ methods: JSON.stringify(methods), source })
     try {
-      data = source ? await fetch(source).then(res => res.json()) : [
-        { 'user': 'barney', 'age': 36 },
-        { 'user': 'fred', 'age': 40 },
-        { 'user': 'pebbles', 'age': 1 }
-      ]
+      input = source ? await fetch(source).then((res) => res.json())
+        : [
+          { user: 'barney', age: 36 },
+          { user: 'fred', age: 40 },
+          { user: 'pebbles', age: 1 },
+        ]
 
-      // chain = _.chain(data)
       for (let method of methods) {
-        // output = _.chain(data)[method.name]([...method.args]).value()
-        output = method.args.length == 1 ? _[method.name](data, method.args[0]) : _[method.name](data, [...method.args])
+        output = method.args.length == 1 ? _[method.name](input, method.args[0]) : _[method.name](input, method.args)
         steps.push({ method, data: output })
-        data = output
-        // chain = chain[method.name]([...method.args])      
+        input = output
       }
-      // output = chain.value()
 
-      if (output) return new Response(JSON.stringify(output, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' } })
-
-      //       tokens = pathSegments.map(segment => esprima.tokenize(segment))
-      //       scripts = pathSegments.map(segment => esprima.parseScript(segment))
-
-      //       matcher = /(?<method>.+)\((?<args>.+)\)/g
-
-      //       exec = pathSegments.map(segment => segment.matchAll(matcher))
-      //         _[pathSegments[0]]()
-
-      //       methods = Object.keys(_).reduce((acc, method) => {
-      //         acc[method] = `https://lodash.do/${method}/:args${pathname}`
-      //         return acc
-      //       }, {})
-
+      if (output) return json(output)
     } catch ({ name, message }) {
       error = { name, message }
     }
 
-    if (error || pathOptions?.debug) return new Response(JSON.stringify({ api, methods, steps, source, data, output, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' } })
-    return new Response(JSON.stringify({ api, source, methods, output, steps, allMethods, error, user }, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8' } })
+    if (error) return json({ api, methods, steps, source, data: input, output, error, user })
+    const allMethods = Object.keys(_)
+    return json({ api, methods, steps, source, output, error, allMethods, user })
   },
+}
+
+function json(body, init) {
+  return new Response(JSON.stringify(body, null, 2), { ...init, headers: { 'content-type': 'application/json; charset=utf-8' } })
 }
