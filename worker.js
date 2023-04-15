@@ -53,31 +53,34 @@ export default {
       segments = segments.slice(requiredArgCount ? 2 : 1)
     }
 
-    let steps = [], input, output, error
+    let steps = [], data, output, error
     const source = segments.length > 0 ? 'https://' + segments.join('/') + search : undefined
     console.log({ methods: JSON.stringify(methods), source })
     try {
-      input = source ? await fetch(source).then((res) => res.json()) : [
+      data = source ? await fetch(source).then((res) => res.json()) : [
         { user: 'barney', age: 36 },
         { user: 'fred', age: 40 },
         { user: 'pebbles', age: 1 },
       ]
 
-      for (let method of methods) {
-        output = _[method.name](input, ...method.args)
-        steps.push({ method, data: output })
-        input = output
-      }
-
-      if (output) return json(output)
+      data = pipeline(methods, data, steps)
+      if (data) return json(data)
     } catch ({ name, message }) {
       error = { name, message }
     }
 
-    if (error) return json({ api, methods, steps, source, data: input, output, error, user })
+    if (error) return json({ api, methods, steps, source, data, output, error, user })
     const allMethods = Object.keys(_)
     return json({ api, methods, steps, source, output, error, allMethods, user })
   },
+}
+
+function pipeline(methods, data, steps) {
+  for (let method of methods) {
+    data = _[method.name](data, ...method.args)
+    steps?.push({ method, data })
+  }
+  return data
 }
 
 function json(body, init) {
