@@ -29,7 +29,7 @@ export default {
 
     let methods = [], segments = pathSegments
     while (_[segments[0]]) {
-      const name = segments[0]
+      const [name, argString] = segments
       const requiredArgCount =
         (_[name] || '')
           .toString()
@@ -40,22 +40,30 @@ export default {
 
       let args = []
       if (requiredArgCount) {
-        args = segments[1].split(',')
-        if (segments[1].includes(':')) { // Parse predicate args for filter, find, etc.
-          args = [args.reduce((acc, keyValue) => {
-            const [key, value] = keyValue.split(':')
-            return { ...acc, [key]: value }
-          }, {})]
+        let matches = [...argString.matchAll(/\.([A-ZA-z]+)\(([^)]*)\)/g)]
+        if (matches.length) {
+          const chain = []
+          args.push({ arg: argString.substring(0, argString.indexOf('.')), chain })
+          for (const match of matches) {
+            const [, name, arg] = match
+            chain.push({ name, args: !arg ? [] : arg.split(',') })
+          }
+        } else {
+          args = argString.split(',')
+          if (argString.includes(':')) { // Parse predicate args for filter, find, etc.
+            args = [args.reduce((acc, keyValue) => {
+              const [key, value] = keyValue.split(':')
+              return { ...acc, [key]: value }
+            }, {})]
+          }
         }
       }
-
       methods.push({ name, args })
       segments = segments.slice(requiredArgCount ? 2 : 1)
     }
 
     let steps = [], data, output, error
     const source = segments.length > 0 ? 'https://' + segments.join('/') + search : undefined
-    console.log({ methods: JSON.stringify(methods), source })
     try {
       data = source ? await fetch(source).then((res) => res.json()) : [
         { user: 'barney', age: 36 },
@@ -77,7 +85,10 @@ export default {
 
 function pipeline(methods, data, steps) {
   for (let method of methods) {
-    data = _[method.name](data, ...method.args)
+    if (method.args.length === 1 && method.args[0].chain) {
+      const { arg, chain } = method.args[0]
+      data = _[method.name](data, (item) => pipeline(chain, _.get(item, arg)))
+    } else data = _[method.name](data, ...method.args)
     steps?.push({ method, data })
   }
   return data
