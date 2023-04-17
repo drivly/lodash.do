@@ -91,12 +91,11 @@ function pipeline(methods, data, steps) {
     if (method.args.length === 1 && method.args[0].chain) {
       const { arg, chain } = method.args[0]
       data = _[method.name](data, (item) => pipeline(chain, arg !== '' && _.get(item, arg) || item))
-    } else {
-      if (method.args.length === 1 && method.args[0].name) {
-        const { args, name } = method.args[0]
-        data = _[method.name](data, (item) => _[name](item, (arg) => pipeline(args, arg)))
-      } else data = _[method.name](data, ...method.args)
-    }
+    } else if (method.args.length === 1 && method.args[0].name) {
+      const { args, name } = method.args[0]
+      data = _[method.name](data, (item) => _[name](item, (arg) => pipeline(args, arg)))
+    } else data = _[method.name](data, ...method.args)
+
     steps?.push({ method, data })
   }
   return data
