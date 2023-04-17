@@ -40,10 +40,12 @@ export default {
 
       let args = []
       if (requiredArgCount) {
-        let matches = [...argString.matchAll(/\.([A-ZA-z]+)\(([^)]*)\)/g)]
+        let matches = [...argString.matchAll(/([A-ZA-z]+)\(([^)]*)\)/g)]
         if (matches.length) {
           const chain = []
-          args.push({ arg: argString.substring(0, argString.indexOf('.')), chain })
+          let arg = argString.substring(0, argString.indexOf('.'))
+          if (arg.includes('(')) arg = null
+          args.push({ arg, chain })
           for (const match of matches) {
             const [, name, arg] = match
             chain.push({ name, args: !arg ? [] : arg.split(',') })
@@ -87,7 +89,7 @@ function pipeline(methods, data, steps) {
   for (let method of methods) {
     if (method.args.length === 1 && method.args[0].chain) {
       const { arg, chain } = method.args[0]
-      data = _[method.name](data, (item) => pipeline(chain, _.get(item, arg)))
+      data = _[method.name](data, (item) => pipeline(chain, arg !== null && _.get(item, arg) || item))
     } else data = _[method.name](data, ...method.args)
     steps?.push({ method, data })
   }
