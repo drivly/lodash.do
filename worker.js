@@ -30,37 +30,12 @@ export default {
     let methods = [], segments = pathSegments
     while (_[segments[0]]) {
       const [name, argString] = segments
-      const requiredArgCount =
-        (_[name] || '')
-          .toString()
-          .match(/\((.*)\)/)[0]
-          .replace(/\(|\)/g, '')
-          .split(',')
-          .filter((arg) => arg !== '').length - 1
-
-      let args = []
-      if (requiredArgCount) {
-        let matches = [...argString.matchAll(/([A-ZA-z]+)\(([^)]*)\)/g)]
-        if (matches.length) {
-          const chain = []
-          let arg = argString.substring(0, argString.indexOf('.'))
-          if (arg.includes('(')) arg = null
-          args.push({ arg, chain })
-          for (const match of matches) {
-            const [, name, arg] = match
-            chain.push({ name, args: !arg ? [] : arg.split(',') })
-          }
-        } else {
-          args = argString.split(',')
-          if (argString.includes(':')) { // Parse predicate args for filter, find, etc.
-            args = [args.reduce((acc, keyValue) => {
-              const [key, value] = keyValue.split(':')
-              return { ...acc, [key]: value }
-            }, {})]
-          }
-        }
-      }
-      methods.push({ name, args })
+      const requiredArgCount = (_[name] || '').toString()
+        .match(/\((.*)\)/)[0]
+        .replace(/\(|\)/g, '')
+        .split(',')
+        .filter((arg) => arg !== '').length - 1
+      methods.push({ name, args: requiredArgCount ? extractArgs(argString) : [] })
       segments = segments.slice(requiredArgCount ? 2 : 1)
     }
 
@@ -72,7 +47,6 @@ export default {
         { user: 'fred', age: 40 },
         { user: 'pebbles', age: 1 },
       ]
-
       output = pipeline(methods, data, steps)
       if (output) return json(output)
     } catch ({ name, message }) {
@@ -80,17 +54,49 @@ export default {
     }
 
     if (error) return json({ api, methods, steps, source, data, output, error, user })
-    const allMethods = Object.keys(_)
-    return json({ api, methods, steps, source, output, error, allMethods, user })
+    return json({ api, methods, steps, source, output, error, allMethods: Object.keys(_), user })
   },
+}
+
+function extractArgs(argString) {
+  const methodPattern = /\.?([A-ZA-z]+)\(([^()]*)\)/g
+  let args = []
+  let methodTokens = [...argString.matchAll(methodPattern)]
+  if (methodTokens.length) {
+    const chain = []
+    for (const match of methodTokens) {
+      const [method, name, arg] = match
+      argString = argString.replace(method, '')
+      chain.push({ name, args: arg ? extractArgs(arg) : [] })
+    }
+    const enclosingMethodTokens = [...argString.matchAll(methodPattern)]
+    if (enclosingMethodTokens.length) {
+      const [, name] = enclosingMethodTokens[0]
+      args.push({ name, args: chain })
+    } else args.push({ arg: argString, chain })
+  } else {
+    args = argString.split(',')
+    if (argString.includes(':')) { // Parse predicate args for filter, find, etc.
+      args = [args.reduce((acc, keyValue) => {
+        const [key, value] = keyValue.split(':')
+        return { ...acc, [key]: value }
+      }, {})]
+    }
+  }
+  return args
 }
 
 function pipeline(methods, data, steps) {
   for (let method of methods) {
     if (method.args.length === 1 && method.args[0].chain) {
       const { arg, chain } = method.args[0]
-      data = _[method.name](data, (item) => pipeline(chain, arg !== null && _.get(item, arg) || item))
-    } else data = _[method.name](data, ...method.args)
+      data = _[method.name](data, (item) => pipeline(chain, arg !== '' && _.get(item, arg) || item))
+    } else {
+      if (method.args.length === 1 && method.args[0].name) {
+        const { args, name } = method.args[0]
+        data = _[method.name](data, (item) => _[name](item, (arg) => pipeline(args, arg)))
+      } else data = _[method.name](data, ...method.args)
+    }
     steps?.push({ method, data })
   }
   return data
